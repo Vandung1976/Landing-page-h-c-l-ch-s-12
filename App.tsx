@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // Helper component for section titles
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
@@ -16,11 +16,101 @@ const InfoCard = ({ icon, title, text }: { icon: string, title: string, text: st
     </div>
 );
 
+// Modal component
+const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean, onClose: () => void, title: string, children: React.ReactNode }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div 
+            className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4 transition-opacity duration-300"
+            onClick={onClose}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+        >
+            <div 
+                className="bg-white p-8 rounded-lg shadow-xl relative max-w-lg w-full m-4" 
+                onClick={(e) => e.stopPropagation()}
+            >
+                <h3 id="modal-title" className="text-2xl font-bold font-montserrat text-brand-maroon mb-4">{title}</h3>
+                <div className="prose max-w-none text-gray-700">{children}</div>
+                <button 
+                    onClick={onClose} 
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-3xl leading-none font-bold"
+                    aria-label="Close modal"
+                >
+                    &times;
+                </button>
+            </div>
+        </div>
+    );
+};
+
+
 const App: React.FC = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalContent, setModalContent] = useState<{ title: string; body: React.ReactNode }>({ title: '', body: null });
+
+    const handleOpenModal = (data: {title: string, body: React.ReactNode}) => {
+        setModalContent(data);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+    // Component for the "Bài giảng điện tử" modal content
+    const BaiGiangModalBody = () => {
+        const [selectedTopic, setSelectedTopic] = useState('');
+
+        const handleViewTopic = () => {
+            if (selectedTopic === 'chu-de-1') {
+                window.open('https://docs.google.com/presentation/d/1b5NviJzYBJVk-AMnnlnyaesRmoE0ka1o/edit?slide=id.p1#slide=id.p1', '_blank', 'noopener,noreferrer');
+            } else if (selectedTopic === 'chu-de-2') {
+                // Placeholder for the second topic
+                alert("Link for 'Chủ đề 2' is not yet available.");
+            }
+        };
+
+        return (
+            <div>
+                <p className="mb-4">Vui lòng chọn một chủ đề từ danh sách bên dưới để xem chi tiết.</p>
+                <select
+                    value={selectedTopic}
+                    onChange={(e) => setSelectedTopic(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-maroon"
+                    aria-label="Chọn chủ đề bài giảng"
+                >
+                    <option value="" disabled>-- Chọn một chủ đề --</option>
+                    <option value="chu-de-1">Chủ đề 1: Thế giới Trong và sau chiến tranh lạnh</option>
+                    <option value="chu-de-2">Chủ đề 2: ASEAN những chặng đường Lịch sử</option>
+                </select>
+                <button
+                    onClick={handleViewTopic}
+                    disabled={!selectedTopic}
+                    className="mt-6 w-full bg-brand-maroon text-white font-bold py-3 px-6 rounded-full hover:bg-red-800 transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    Xem ngay
+                </button>
+            </div>
+        );
+    };
+
     const resources = [
-        { name: 'Bài giảng điện tử', link: 'https://docs.google.com/presentation/d/1b5NviJzYBJVk-AMnnlnyaesRmoE0ka1o/edit?slide=id.p1#slide=id.p1' },
+        {
+            name: 'Bài giảng điện tử',
+            isModal: true,
+            modalData: {
+                title: 'Chọn chủ đề Bài giảng',
+                body: <BaiGiangModalBody />
+            }
+        },
         { name: 'Phiếu học tập', link: '#' },
-        { name: 'Bản đồ tư duy & Timeline', link: '#' },
+        { 
+            name: 'Bản đồ tư duy & Timeline', 
+            link: '#chiTiet', 
+        },
         { name: 'Tư liệu lịch sử địa phương', link: '#' },
         { name: 'Trò chơi & Quiz', link: '#' },
         { name: 'Video bài giảng ngắn', link: '#' },
@@ -91,14 +181,23 @@ const App: React.FC = () => {
                             {resources.map((item) => (
                                 <div key={item.name} className="border border-gray-200 rounded-lg p-6 text-center shadow-md hover:shadow-xl transition-shadow flex flex-col justify-between">
                                     <h3 className="font-montserrat font-bold text-xl text-brand-maroon">{item.name}</h3>
-                                    <a
-                                        href={item.link}
-                                        target={item.link !== '#' ? '_blank' : '_self'}
-                                        rel={item.link !== '#' ? 'noopener noreferrer' : undefined}
-                                        className="mt-4 bg-brand-maroon text-white font-bold py-2 px-6 rounded-full hover:bg-red-800 transition duration-300 inline-block"
-                                    >
-                                        Xem chi tiết
-                                    </a>
+                                    {(item as any).isModal ? (
+                                        <button
+                                            onClick={() => handleOpenModal((item as any).modalData)}
+                                            className="mt-4 bg-brand-maroon text-white font-bold py-2 px-6 rounded-full hover:bg-red-800 transition duration-300 inline-block"
+                                        >
+                                            Xem chi tiết
+                                        </button>
+                                    ) : (
+                                        <a
+                                            href={(item as any).link}
+                                            target={(item as any).link.startsWith('http') ? '_blank' : '_self'}
+                                            rel={(item as any).link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                                            className="mt-4 bg-brand-maroon text-white font-bold py-2 px-6 rounded-full hover:bg-red-800 transition duration-300 inline-block"
+                                        >
+                                            {(item as any).link === '#chiTiet' ? 'Xem' : 'Xem chi tiết'}
+                                        </a>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -110,19 +209,32 @@ const App: React.FC = () => {
                     </div>
                 </section>
 
+                {/* 3.5. Details Section */}
+                <section id="chiTiet" className="py-16 lg:py-24">
+                  <div className="container mx-auto px-6">
+                      <SectionTitle>Chi tiết học liệu</SectionTitle>
+                      <div className="mt-12 max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg text-center">
+                        <h3 className="text-2xl font-bold font-montserrat text-brand-maroon mb-4">Bản đồ tư duy & Timeline</h3>
+                        <p className="text-lg">
+                          Thông tin chi tiết về chủ đề Lịch sử 12, video, hình ảnh minh họa, bài tập,...
+                        </p>
+                      </div>
+                  </div>
+                </section>
+
                 {/* 4. Support Section */}
-                <section id="ho-tro" className="py-16 lg:py-24">
+                <section id="ho-tro" className="py-16 lg:py-24 bg-white">
                     <div className="container mx-auto px-6">
                         <SectionTitle>Dạy – Học – Trải nghiệm cùng nhau</SectionTitle>
                         <div className="mt-12 grid md:grid-cols-2 gap-12">
-                            <div className="bg-white p-8 rounded-lg shadow-lg">
+                            <div className="bg-gray-50 p-8 rounded-lg shadow-inner">
                                 <h3 className="text-2xl font-bold font-montserrat text-brand-maroon mb-4">👩‍🏫 Dành cho giáo viên</h3>
                                 <ul className="list-disc list-inside space-y-2">
                                     <li>Giáo án mẫu, hoạt động lớp, công cụ đánh giá năng lực.</li>
                                     <li>Hướng dẫn ứng dụng CNTT (Canva, Quizizz, Google Form...).</li>
                                 </ul>
                             </div>
-                            <div className="bg-white p-8 rounded-lg shadow-lg">
+                            <div className="bg-gray-50 p-8 rounded-lg shadow-inner">
                                 <h3 className="text-2xl font-bold font-montserrat text-brand-maroon mb-4">🧑‍🎓 Dành cho học sinh</h3>
                                 <ul className="list-disc list-inside space-y-2">
                                     <li>Kho video bài giảng ngắn (5–10 phút).</li>
@@ -180,6 +292,10 @@ const App: React.FC = () => {
                     </div>
                 </section>
             </main>
+
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={modalContent.title}>
+                {modalContent.body}
+            </Modal>
 
             {/* Footer */}
             <footer className="bg-gray-800 text-white py-8">
