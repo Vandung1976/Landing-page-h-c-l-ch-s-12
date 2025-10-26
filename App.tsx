@@ -1,7 +1,12 @@
+
 import React, { useState } from 'react';
 
 // Helper component for section titles
-const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+// FIX: Using a type alias for props for better readability and to avoid potential typing issues.
+type SectionTitleProps = {
+    children: React.ReactNode;
+};
+const SectionTitle = ({ children }: SectionTitleProps) => (
     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat text-brand-maroon text-center">
         {children}
     </h2>
@@ -17,7 +22,14 @@ const InfoCard = ({ icon, title, text }: { icon: string, title: string, text: st
 );
 
 // Modal component
-const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean, onClose: () => void, title: string, children: React.ReactNode }) => {
+// FIX: Using a type alias for props for better readability and to avoid potential typing issues.
+type ModalProps = {
+    isOpen: boolean;
+    onClose: () => void;
+    title: string;
+    children: React.ReactNode;
+};
+const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
     if (!isOpen) return null;
 
     return (
@@ -29,11 +41,9 @@ const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean, onClose:
             aria-labelledby="modal-title"
         >
             <div 
-                className="bg-white p-8 rounded-lg shadow-xl relative max-w-lg w-full m-4" 
+                className="bg-white p-8 rounded-2xl shadow-xl relative max-w-lg w-full m-4" 
                 onClick={(e) => e.stopPropagation()}
             >
-                <h3 id="modal-title" className="text-2xl font-bold font-montserrat text-brand-maroon mb-4">{title}</h3>
-                <div className="prose max-w-none text-gray-700">{children}</div>
                 <button 
                     onClick={onClose} 
                     className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-3xl leading-none font-bold"
@@ -41,6 +51,8 @@ const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean, onClose:
                 >
                     &times;
                 </button>
+                <h3 id="modal-title" className="text-2xl font-bold font-montserrat text-brand-maroon mb-2 text-center">{title}</h3>
+                <div className="prose max-w-none text-gray-700">{children}</div>
             </div>
         </div>
     );
@@ -62,34 +74,80 @@ const App: React.FC = () => {
 
     // Component for the "Bài giảng điện tử" modal content
     const BaiGiangModalBody = () => {
-        const [selectedTopic, setSelectedTopic] = useState('');
+        const topics = {
+            'chu-de-1': {
+                name: 'Chủ đề 1: Thế giới Trong và sau chiến tranh lạnh',
+                lessons: [
+                    { id: 'bai-1-1', name: 'Bài 1: Liên hợp quốc', link: 'https://drive.google.com/file/d/1PP32mpxS0qLbm6ssCz30xdrrGKN0MF9Y/view' },
+                    { id: 'bai-1-2', name: 'Bài 2: Trật tự thế giới trong chiến tranh lạnh', link: 'https://docs.google.com/presentation/d/1YSgvmP-avAN3z53ZEDhdCrg5foyVEeGJ/edit?slide=id.p1#slide=id.p1' },
+                    { id: 'bai-1-3', name: 'Bài 3: Trật tự thế giới sau chiến tranh', link: 'https://drive.google.com/file/d/1uYiBvV6nONbb_nzGBRs4YyDJK-QBR_YA/view' },
+                ]
+            },
+            'chu-de-2': {
+                name: 'Chủ đề 2: ASEAN những chặng đường Lịch sử',
+                lessons: [
+                    { id: 'bai-2-4', name: 'Bài 4: Sự ra đời và phát triển của Hiệp hội các quốc gia Đông Nam Á ( ASEAN)', link: '#' },
+                    { id: 'bai-2-5', name: 'Bài 5: Cộng đồng ASEAN : Từ ý tưởng đến hiện thực', link: '#' },
+                ]
+            }
+        };
 
-        const handleViewTopic = () => {
-            if (selectedTopic === 'chu-de-1') {
-                window.open('https://docs.google.com/presentation/d/1b5NviJzYBJVk-AMnnlnyaesRmoE0ka1o/edit?slide=id.p1#slide=id.p1', '_blank', 'noopener,noreferrer');
-            } else if (selectedTopic === 'chu-de-2') {
-                // Placeholder for the second topic
-                alert("Link for 'Chủ đề 2' is not yet available.");
+        const [selectedTopic, setSelectedTopic] = useState('');
+        const [selectedLesson, setSelectedLesson] = useState('');
+
+        const handleTopicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            setSelectedTopic(e.target.value);
+            setSelectedLesson(''); // Reset lesson selection when topic changes
+        };
+
+        const handleViewLesson = () => {
+            if (!selectedTopic || !selectedLesson) return;
+            
+            const topic = topics[selectedTopic as keyof typeof topics];
+            const lesson = topic.lessons.find(l => l.id === selectedLesson);
+
+            if (lesson && lesson.link !== '#') {
+                window.open(lesson.link, '_blank', 'noopener,noreferrer');
+            } else {
+                alert("Nội dung cho bài học này chưa có sẵn.");
             }
         };
 
         return (
-            <div>
-                <p className="mb-4">Vui lòng chọn một chủ đề từ danh sách bên dưới để xem chi tiết.</p>
-                <select
-                    value={selectedTopic}
-                    onChange={(e) => setSelectedTopic(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-maroon"
-                    aria-label="Chọn chủ đề bài giảng"
-                >
-                    <option value="" disabled>-- Chọn một chủ đề --</option>
-                    <option value="chu-de-1">Chủ đề 1: Thế giới Trong và sau chiến tranh lạnh</option>
-                    <option value="chu-de-2">Chủ đề 2: ASEAN những chặng đường Lịch sử</option>
-                </select>
+            <div className="text-center">
+                <p className="mb-6 text-base">Vui lòng chọn một chủ đề từ danh sách bên dưới để xem chi tiết.</p>
+                <div className="space-y-4">
+                    <select
+                        value={selectedTopic}
+                        onChange={handleTopicChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-maroon/50"
+                        aria-label="Chọn chủ đề bài giảng"
+                    >
+                        <option value="" disabled>-- Chọn một chủ đề --</option>
+                        {Object.entries(topics).map(([key, topic]) => (
+                            <option key={key} value={key}>{topic.name}</option>
+                        ))}
+                    </select>
+
+                    {selectedTopic && (
+                        <select
+                            value={selectedLesson}
+                            onChange={(e) => setSelectedLesson(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-maroon/50"
+                            aria-label="Chọn bài học"
+                        >
+                            <option value="" disabled>-- Chọn một bài học --</option>
+                            {topics[selectedTopic as keyof typeof topics].lessons.map((lesson) => (
+                                <option key={lesson.id} value={lesson.id}>{lesson.name}</option>
+                            ))}
+                        </select>
+                    )}
+                </div>
+
                 <button
-                    onClick={handleViewTopic}
-                    disabled={!selectedTopic}
-                    className="mt-6 w-full bg-brand-maroon text-white font-bold py-3 px-6 rounded-full hover:bg-red-800 transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    onClick={handleViewLesson}
+                    disabled={!selectedLesson}
+                    className="mt-8 w-full bg-brand-maroon text-white font-bold py-4 px-6 rounded-full text-lg hover:bg-red-800 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed transform hover:scale-105"
                 >
                     Xem ngay
                 </button>
@@ -144,6 +202,13 @@ const App: React.FC = () => {
                     </div>
                 </div>
             </header>
+            
+            {/* Marquee Text */}
+            <div className="bg-brand-maroon py-2 overflow-x-hidden">
+              <p className="animate-marquee whitespace-nowrap text-brand-yellow font-bold text-3xl">
+                Trường phổ thông dân tộc nội trú THPT Bình Phước tỉnh Đồng Nai - Tổ chuyên môn TDQP - Sử - Địa - GDKTPL
+              </p>
+            </div>
 
             <main>
                 {/* 2. Introduction Section */}
