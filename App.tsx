@@ -1,19 +1,25 @@
-
 import React, { useState } from 'react';
 
 // Helper component for section titles
-// FIX: Using a type alias for props for better readability and to avoid potential typing issues.
-type SectionTitleProps = {
-    children: React.ReactNode;
-};
-const SectionTitle = ({ children }: SectionTitleProps) => (
+// FIX: Refactored component props to use a dedicated interface. This resolves a TypeScript error where the 'children' prop was not being correctly inferred.
+interface SectionTitleProps {
+  children: React.ReactNode;
+}
+// FIX: Explicitly typed SectionTitle as a React.FC to resolve TypeScript errors where the `children` prop was not being correctly inferred.
+const SectionTitle: React.FC<SectionTitleProps> = ({ children }) => (
     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat text-brand-maroon text-center">
         {children}
     </h2>
 );
 
 // Card component for reuse
-const InfoCard = ({ icon, title, text }: { icon: string, title: string, text: string }) => (
+// FIX: Refactored component props to use a dedicated interface for consistency and clarity.
+interface InfoCardProps {
+  icon: string;
+  title: string;
+  text: string;
+}
+const InfoCard = ({ icon, title, text }: InfoCardProps) => (
     <div className="bg-white p-6 rounded-lg shadow-lg text-center h-full">
         <div className="text-4xl mb-4 text-brand-maroon">{icon}</div>
         <h3 className="text-xl font-bold font-montserrat mb-2">{title}</h3>
@@ -22,14 +28,20 @@ const InfoCard = ({ icon, title, text }: { icon: string, title: string, text: st
 );
 
 // Modal component
-// FIX: Using a type alias for props for better readability and to avoid potential typing issues.
-type ModalProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    title: string;
-    children: React.ReactNode;
-};
-const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+// FIX: Refactored component props to use a dedicated interface. This resolves a TypeScript error where the 'children' prop was not being correctly inferred.
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}
+// FIX: Explicitly typed Modal as a React.FC to resolve TypeScript errors where the `children` prop was not being correctly inferred.
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+}) => {
     if (!isOpen) return null;
 
     return (
@@ -154,6 +166,194 @@ const App: React.FC = () => {
             </div>
         );
     };
+    
+    // Component for the "Bản đồ tư duy & Timeline" modal content
+    const TuDuyTimelineModalBody = () => {
+        const tuDuyTopics = {
+            'chu-de-1': {
+                name: 'Chủ đề 1: Thế giới trong và sau Chiến tranh lạnh',
+                link: 'https://drive.google.com/file/d/1V3FZaiBrYedHVGgJrAUGueDZCLc3PUGX/view?usp=sharing'
+            },
+            'chu-de-2': {
+                name: 'Chủ đề 2: ASEAN những chặng đường lịch sử',
+                link: 'https://drive.google.com/file/d/1tGTFOd1-uOENIN7zRt8XfTaUzQ8QsOwh/view?usp=sharing'
+            },
+            'chu-de-3': {
+                name: 'Chủ đề 3: Cách mạng tháng tám năm 1945',
+                link: 'https://drive.google.com/file/d/1RUDWqd8NaOV7EPykdBufq_8UkXsEoJBe/view?usp=sharing'
+            },
+            'chu-de-4': {
+                name: 'Chủ đề 4: Công cuộc đổi mới ở Việt Nam từ 1986 đến nay',
+                link: 'https://drive.google.com/file/d/1zf7LtC_QeXKeRUIFdudMaxbN-Xvy3iHy/view?usp=sharing'
+            },
+            'chu-de-5': {
+                name: 'Chủ đề 5: Lịch sử đối ngoại của Việt Nam thời cận - hiện đại',
+                link: 'https://drive.google.com/file/d/12LnWGs_CPQciYAjAsQ77rVs3WuqPrb85/view?usp=sharing'
+            },
+            'chu-de-6': {
+                name: 'Chủ đề 6: Hồ Chí Minh trong lịch sử Việt Nam',
+                link: 'https://drive.google.com/file/d/1Eco1u47C5UDOB-OQ3JIkUb9bPJwa21FC/view?usp=sharing'
+            },
+        };
+
+        const [contentType, setContentType] = useState(''); // 'sodotuduy' or 'timeline'
+        const [selectedTopic, setSelectedTopic] = useState('');
+        const [viewContent, setViewContent] = useState<{title: string, content: string} | null>(null);
+
+        const handleContentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            setContentType(e.target.value);
+            setSelectedTopic('');
+            setViewContent(null);
+        };
+        
+        const handleTopicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            setSelectedTopic(e.target.value);
+        };
+
+        const handleViewContent = () => {
+            if (!contentType || !selectedTopic) return;
+            
+            let topicData;
+            if (contentType === 'sodotuduy') {
+                topicData = tuDuyTopics[selectedTopic as keyof typeof tuDuyTopics];
+            }
+            
+            if (topicData) {
+                if ((topicData as any).link) {
+                    window.open((topicData as any).link, '_blank', 'noopener,noreferrer');
+                } else if ((topicData as any).content) {
+                    setViewContent({title: topicData.name, content: (topicData as any).content});
+                } else {
+                    alert("Nội dung chưa có sẵn.");
+                }
+            } else {
+                alert("Nội dung chưa có sẵn.");
+            }
+        };
+
+        const handleBack = () => {
+            setViewContent(null);
+        };
+
+        if (viewContent) {
+            return (
+                <div>
+                    <button onClick={handleBack} className="mb-4 text-sm text-brand-maroon font-bold hover:underline">&larr; Quay lại chọn chủ đề</button>
+                    <h4 className="text-xl font-bold font-montserrat text-brand-maroon mb-2">{viewContent.title}</h4>
+                    <p>{viewContent.content}</p>
+                </div>
+            )
+        }
+
+        return (
+            <div className="text-center">
+                <p className="mb-6 text-base">Vui lòng chọn một nội dung từ danh sách bên dưới để xem chi tiết.</p>
+                <div className="space-y-4">
+                    <select
+                        value={contentType}
+                        onChange={handleContentTypeChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-maroon/50"
+                        aria-label="Chọn nội dung cần xem"
+                    >
+                        <option value="" disabled>-- Chọn nội dung cần xem --</option>
+                        <option value="sodotuduy">Sơ đồ tư duy</option>
+                        <option value="timeline">Timeline</option>
+                    </select>
+
+                    {contentType === 'sodotuduy' && (
+                        <select
+                            value={selectedTopic}
+                            onChange={handleTopicChange}
+                            className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-maroon/50"
+                            aria-label="Chọn chủ đề sơ đồ tư duy"
+                        >
+                            <option value="" disabled>-- Chọn một chủ đề --</option>
+                            {Object.entries(tuDuyTopics).map(([key, topic]) => (
+                                <option key={key} value={key}>{topic.name}</option>
+                            ))}
+                        </select>
+                    )}
+
+                    {contentType === 'timeline' && (
+                         <div className="text-gray-500 p-4 border rounded-lg bg-gray-50">Nội dung Timeline sắp ra mắt. Vui lòng quay lại sau.</div>
+                    )}
+                </div>
+
+                <button
+                    onClick={handleViewContent}
+                    disabled={!selectedTopic || contentType !== 'sodotuduy'}
+                    className="mt-8 w-full bg-brand-maroon text-white font-bold py-4 px-6 rounded-full text-lg hover:bg-red-800 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed transform hover:scale-105"
+                >
+                    Xem
+                </button>
+            </div>
+        );
+    };
+
+    // Component for the "Bài tập lịch sử" modal content
+    const BaiTapLichSuModalBody = () => {
+        const exerciseCategories = {
+            'trac-nghiem-chu-de': {
+                name: 'Bài tập trắc nghiệm theo chủ đề nhiều lựa chọn',
+                link: '#'
+            },
+            'trac-nghiem-dung-sai': {
+                name: 'Trắc nghiệm đúng - sai',
+                link: '#'
+            },
+            'tu-luan': {
+                name: 'Bài tập tự luận',
+                link: '#'
+            },
+            'de-luyen-thi': {
+                name: 'Đề luyện thi thử tốt nghiệp',
+                link: 'https://drive.google.com/drive/u/0/folders/1qZMU_FOMAhKNLySPKhyNONz0OkhBjV9v'
+            }
+        };
+
+        const [selectedCategory, setSelectedCategory] = useState('');
+
+        const handleViewExercise = () => {
+            if (!selectedCategory) return;
+            const category = exerciseCategories[selectedCategory as keyof typeof exerciseCategories];
+            if (category && category.link !== '#') {
+                window.open(category.link, '_blank', 'noopener,noreferrer');
+            } else {
+                alert("Nội dung cho danh mục này chưa có sẵn.");
+            }
+        };
+
+        const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            setSelectedCategory(e.target.value);
+        };
+
+        return (
+            <div className="text-center">
+                <p className="mb-6 text-base">Vui lòng chọn một danh mục tài liệu từ danh sách bên dưới để xem chi tiết.</p>
+                <div className="space-y-4">
+                    <select
+                        value={selectedCategory}
+                        onChange={handleCategoryChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-maroon/50"
+                        aria-label="Chọn danh mục bài tập"
+                    >
+                        <option value="" disabled>-- Chọn một danh mục --</option>
+                        {Object.entries(exerciseCategories).map(([key, category]) => (
+                            <option key={key} value={key}>{category.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <button
+                    onClick={handleViewExercise}
+                    disabled={!selectedCategory}
+                    className="mt-8 w-full bg-brand-maroon text-white font-bold py-4 px-6 rounded-full text-lg hover:bg-red-800 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed transform hover:scale-105"
+                >
+                    Xem
+                </button>
+            </div>
+        );
+    };
+
 
     const resources = [
         {
@@ -164,10 +364,21 @@ const App: React.FC = () => {
                 body: <BaiGiangModalBody />
             }
         },
-        { name: 'Phiếu học tập', link: '#' },
+        {
+            name: 'Bài tập lịch sử',
+            isModal: true,
+            modalData: {
+                title: 'Chọn danh mục Bài tập',
+                body: <BaiTapLichSuModalBody />
+            }
+        },
         { 
             name: 'Bản đồ tư duy & Timeline', 
-            link: '#chiTiet', 
+            isModal: true,
+            modalData: {
+                title: 'Chọn nội dung cần xem',
+                body: <TuDuyTimelineModalBody />
+            }
         },
         { name: 'Tư liệu lịch sử địa phương', link: '#' },
         { name: 'Trò chơi & Quiz', link: '#' },
@@ -260,7 +471,7 @@ const App: React.FC = () => {
                                             rel={(item as any).link.startsWith('http') ? 'noopener noreferrer' : undefined}
                                             className="mt-4 bg-brand-maroon text-white font-bold py-2 px-6 rounded-full hover:bg-red-800 transition duration-300 inline-block"
                                         >
-                                            {(item as any).link === '#chiTiet' ? 'Xem' : 'Xem chi tiết'}
+                                            Xem chi tiết
                                         </a>
                                     )}
                                 </div>
