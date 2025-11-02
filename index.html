@@ -5,54 +5,24 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Học Liệu Số Lịch Sử 12</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'brand-maroon': '#8C1D18',
-              'brand-yellow': '#FDF4D9',
-            },
-            fontFamily: {
-              'montserrat': ['Montserrat', 'sans-serif'],
-              'nunito': ['Nunito Sans', 'sans-serif'],
-              'times': ['Times New Roman', 'serif'],
-            },
-            animation: {
-              'marquee-rtl': 'marquee-rtl 25s linear infinite',
-            },
-            keyframes: {
-              'marquee-rtl': {
-                '0%': { transform: 'translateX(100vw)' },
-                '100%': { transform: 'translateX(-100%)' },
-              },
-            },
-          }
-        }
-      }
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <script type="importmap">
+  <script type="importmap">
 {
   "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0"
+    "vite": "https://aistudiocdn.com/vite@^7.1.12",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.0"
   }
 }
 </script>
-    <style>
-      body {
-        scroll-behavior: smooth;
-      }
-    </style>
-  </head>
+</head>
   <body class="bg-white text-gray-800 font-nunito">
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>
