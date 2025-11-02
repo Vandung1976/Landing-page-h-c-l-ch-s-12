@@ -1,6 +1,5 @@
-
 import { GoogleGenAI, Chat } from "@google/genai";
-import { LANDIA_SYSTEM_PROMPT } from '../constants';
+import { HISTORY_TUTOR_SYSTEM_PROMPT } from '../constants';
 
 if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
@@ -12,7 +11,7 @@ export function getAiChat(): Chat {
     const chat: Chat = ai.chats.create({
         model: 'gemini-2.5-flash',
         config: {
-            systemInstruction: LANDIA_SYSTEM_PROMPT,
+            systemInstruction: HISTORY_TUTOR_SYSTEM_PROMPT,
         },
     });
     return chat;

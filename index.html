@@ -17,12 +17,13 @@
             fontFamily: {
               'montserrat': ['Montserrat', 'sans-serif'],
               'nunito': ['Nunito Sans', 'sans-serif'],
+              'times': ['Times New Roman', 'serif'],
             },
             animation: {
-              marquee: 'marquee 15s linear infinite',
+              'marquee-rtl': 'marquee-rtl 25s linear infinite',
             },
             keyframes: {
-              marquee: {
+              'marquee-rtl': {
                 '0%': { transform: 'translateX(100vw)' },
                 '100%': { transform: 'translateX(-100%)' },
               },
@@ -35,15 +36,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
     <script type="importmap">
-    {
-      "imports": {
-        "react/": "https://aistudiocdn.com/react@^19.2.0/",
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.27.0"
-      }
-    }
-    </script>
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0"
+  }
+}
+</script>
     <style>
       body {
         scroll-behavior: smooth;

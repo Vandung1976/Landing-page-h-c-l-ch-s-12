@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
+import { ChatbotWidget } from './components/ChatbotWidget';
 
 // Helper component for section titles
-// FIX: Refactored component props to use a dedicated interface. This resolves a TypeScript error where the 'children' prop was not being correctly inferred.
 interface SectionTitleProps {
   children: React.ReactNode;
 }
-// FIX: Explicitly typed SectionTitle as a React.FC to resolve TypeScript errors where the `children` prop was not being correctly inferred.
 const SectionTitle: React.FC<SectionTitleProps> = ({ children }) => (
     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat text-brand-maroon text-center">
         {children}
@@ -13,29 +12,26 @@ const SectionTitle: React.FC<SectionTitleProps> = ({ children }) => (
 );
 
 // Card component for reuse
-// FIX: Refactored component props to use a dedicated interface for consistency and clarity.
 interface InfoCardProps {
   icon: string;
   title: string;
   text: string;
 }
 const InfoCard = ({ icon, title, text }: InfoCardProps) => (
-    <div className="bg-white p-6 rounded-lg shadow-lg text-center h-full">
-        <div className="text-4xl mb-4 text-brand-maroon">{icon}</div>
-        <h3 className="text-xl font-bold font-montserrat mb-2">{title}</h3>
-        <p>{text}</p>
+    <div className="bg-white p-8 rounded-2xl shadow-lg text-center h-full transform hover:-translate-y-2 transition-transform duration-300">
+        <div className="text-5xl mb-5 inline-block">{icon}</div>
+        <h3 className="text-xl font-bold font-montserrat mb-3 text-gray-800">{title}</h3>
+        <p className="text-gray-600">{text}</p>
     </div>
 );
 
 // Modal component
-// FIX: Refactored component props to use a dedicated interface. This resolves a TypeScript error where the 'children' prop was not being correctly inferred.
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
 }
-// FIX: Explicitly typed Modal as a React.FC to resolve TypeScript errors where the `children` prop was not being correctly inferred.
 const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -74,6 +70,7 @@ const Modal: React.FC<ModalProps> = ({
 const App: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState<{ title: string; body: React.ReactNode }>({ title: '', body: null });
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     const handleOpenModal = (data: {title: string, body: React.ReactNode}) => {
         setModalContent(data);
@@ -354,13 +351,12 @@ const App: React.FC = () => {
         );
     };
 
-
     const resources = [
         {
             name: 'Bài giảng điện tử',
             isModal: true,
             modalData: {
-                title: 'Chọn chủ đề Bài giảng',
+                title: 'Chọn Bài giảng điện tử',
                 body: <BaiGiangModalBody />
             }
         },
@@ -386,210 +382,187 @@ const App: React.FC = () => {
     ];
 
     return (
-        <div className="bg-brand-yellow">
-            {/* 1. Hero Section */}
-            <header
-                className="relative text-white text-center py-20 lg:py-32 bg-cover bg-center"
-                style={{ backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/1/1c/Ho_Chi_Minh_1946.jpg')" }}
-            >
-                {/* Maroon overlay */}
-                <div className="absolute inset-0 bg-brand-maroon opacity-80" aria-hidden="true"></div>
-
-                {/* Content */}
-                <div className="relative container mx-auto px-6">
-                    <h1 className="text-4xl lg:text-6xl font-black font-montserrat text-brand-yellow drop-shadow-lg">
-                        KHÁM PHÁ LỊCH SỬ – NUÔI DƯỠNG LÒNG YÊU NƯỚC!
-                    </h1>
-                    <p className="mt-4 text-lg lg:text-xl max-w-3xl mx-auto text-white">
+        <div className="bg-white">
+            <header className="bg-brand-maroon relative">
+                <div className="absolute inset-0 bg-black opacity-30"></div>
+                <div className="container mx-auto px-6 py-24 text-center text-white relative z-10">
+                    <h1 className="text-4xl md:text-6xl font-black font-montserrat mb-4 tracking-tight">KHÁM PHÁ LỊCH SỬ – NUÔI DƯỠNG LÒNG YÊU NƯỚC!</h1>
+                    <p className="text-lg md:text-xl max-w-3xl mx-auto font-nunito">
                         Học liệu số môn Lịch sử 12 – Chương trình GDPT 2018 dành cho giáo viên và học sinh THPT.
                     </p>
-                    <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-                        <a href="#kho-hoc-lieu" className="bg-brand-yellow text-brand-maroon font-bold py-3 px-8 rounded-full text-lg hover:bg-white transition duration-300">
+                    <div className="mt-8 flex justify-center items-center gap-4 flex-wrap">
+                        <button onClick={() => document.getElementById('resources')?.scrollIntoView()} className="bg-white text-brand-maroon font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-200 transition-all duration-300 transform hover:scale-105">
                             Khám phá ngay
-                        </a>
-                        <a href="#kho-hoc-lieu" className="border-2 border-brand-yellow text-brand-yellow font-bold py-3 px-8 rounded-full text-lg hover:bg-brand-yellow hover:text-brand-maroon transition duration-300">
+                        </button>
+                         <button className="border-2 border-white text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-white hover:text-brand-maroon transition-all duration-300 transform hover:scale-105">
                             Tải học liệu miễn phí
-                        </a>
+                        </button>
                     </div>
                 </div>
             </header>
-            
-            {/* Marquee Text */}
-            <div className="bg-brand-maroon py-2 overflow-x-hidden">
-              <p className="animate-marquee whitespace-nowrap text-brand-yellow font-bold text-3xl">
-                Trường phổ thông dân tộc nội trú THPT Bình Phước tỉnh Đồng Nai - Tổ chuyên môn TDQP - Sử - Địa - GDKTPL
-              </p>
+            <div className="bg-brand-maroon text-white overflow-hidden">
+                <p className="py-2 font-times text-[30px] whitespace-nowrap animate-marquee-rtl">
+                    Trường PT Dân tộc nội trú THPT tỉnh Bình Phước - Tổ chuyên môn TDQP - Sử - Địa - GDKTPL
+                </p>
             </div>
 
             <main>
-                {/* 2. Introduction Section */}
-                <section id="gioi-thieu" className="py-16 lg:py-24">
+                <section id="why-us" className="py-16 lg:py-24 bg-brand-yellow">
                     <div className="container mx-auto px-6">
                         <SectionTitle>Tại sao nên chọn học liệu số Lịch sử 12?</SectionTitle>
-                        <div className="mt-12 grid md:grid-cols-3 gap-8">
-                            <InfoCard
-                                icon="🎓"
-                                title="Giáo viên dạy dễ hơn"
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+                            <InfoCard 
+                                icon="🎓" 
+                                title="Giáo viên dạy dễ hơn" 
                                 text="Học liệu biên soạn theo GDPT 2018, tích hợp đa phương tiện, hỗ trợ soạn giảng hiệu quả."
                             />
-                            <InfoCard
-                                icon="📱"
-                                title="Học sinh học hứng thú hơn"
+                             <InfoCard 
+                                icon="📱" 
+                                title="Học sinh hứng thú hơn" 
                                 text="Video, infographic, và trò chơi tương tác giúp việc học Lịch sử trở nên sống động và thú vị."
                             />
-                            <InfoCard
-                                icon="🌍"
-                                title="Lịch sử gắn liền thực tế"
+                             <InfoCard 
+                                icon="🌍" 
+                                title="Lịch sử gắn liền thực tế" 
                                 text="Nội dung được cập nhật thường xuyên, gắn liền với các chuyên đề và lịch sử địa phương."
                             />
                         </div>
                     </div>
                 </section>
 
-                {/* 3. Resources Section */}
-                <section id="kho-hoc-lieu" className="py-16 lg:py-24 bg-white">
-                    <div className="container mx-auto px-6">
+                <section id="resources" className="py-16 lg:py-24 bg-white">
+                    <div className="container mx-auto px-6 text-center">
                         <SectionTitle>Kho học liệu – "Tất cả tài nguyên bạn cần"</SectionTitle>
-                        <p className="text-center max-w-2xl mx-auto mt-4 text-lg">
-                            Khám phá kho tài nguyên đa dạng, từ bài giảng điện tử, phiếu học tập đến các trò chơi trắc nghiệm Lịch sử 12.
+                        <p className="mt-4 max-w-3xl mx-auto text-lg text-gray-600">
+                           Khám phá kho tài nguyên đa dạng, từ bài giảng điện tử, phiếu học tập đến các trò chơi trắc nghiệm Lịch sử 12.
                         </p>
-                        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {resources.map((item) => (
-                                <div key={item.name} className="border border-gray-200 rounded-lg p-6 text-center shadow-md hover:shadow-xl transition-shadow flex flex-col justify-between">
-                                    <h3 className="font-montserrat font-bold text-xl text-brand-maroon">{item.name}</h3>
-                                    {(item as any).isModal ? (
-                                        <button
-                                            onClick={() => handleOpenModal((item as any).modalData)}
-                                            className="mt-4 bg-brand-maroon text-white font-bold py-2 px-6 rounded-full hover:bg-red-800 transition duration-300 inline-block"
-                                        >
-                                            Xem chi tiết
-                                        </button>
-                                    ) : (
-                                        <a
-                                            href={(item as any).link}
-                                            target={(item as any).link.startsWith('http') ? '_blank' : '_self'}
-                                            rel={(item as any).link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                                            className="mt-4 bg-brand-maroon text-white font-bold py-2 px-6 rounded-full hover:bg-red-800 transition duration-300 inline-block"
-                                        >
-                                            Xem chi tiết
-                                        </a>
-                                    )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 text-left">
+                             {resources.map((item) => (
+                                <div key={item.name} className="bg-white p-6 rounded-lg shadow-md border border-gray-100 flex flex-col justify-between items-start">
+                                    <h3 className="text-xl font-bold font-montserrat text-gray-800">{item.name}</h3>
+                                    <div className="mt-4">
+                                        {'isModal' in item && item.isModal ? (
+                                            <button
+                                                onClick={() => handleOpenModal(item.modalData)}
+                                                className="bg-brand-maroon text-white font-bold py-2 px-6 rounded-full hover:bg-red-800 transition duration-300"
+                                            >
+                                                Xem chi tiết
+                                            </button>
+                                        ) : (
+                                            <a
+                                                href={(item as {link: string}).link}
+                                                target={(item as {link: string}).link.startsWith('http') ? '_blank' : undefined}
+                                                rel={(item as {link:string}).link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                                                className="bg-brand-maroon text-white font-bold py-2 px-6 rounded-full hover:bg-red-800 transition duration-300 inline-block"
+                                            >
+                                                Xem chi tiết
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
-                         <div className="text-center mt-12">
-                             <a href="#" className="bg-green-600 text-white font-bold py-4 px-10 rounded-full text-xl hover:bg-green-700 transition duration-300 inline-block">
+                        <div className="mt-16">
+                             <button className="bg-green-600 text-white font-bold py-4 px-10 rounded-full text-xl hover:bg-green-700 transition-all duration-300 transform hover:scale-105">
                                 Tải trọn bộ học liệu (Miễn phí)
-                             </a>
-                         </div>
+                            </button>
+                        </div>
                     </div>
                 </section>
-
-                {/* 3.5. Details Section */}
-                <section id="chiTiet" className="py-16 lg:py-24">
-                  <div className="container mx-auto px-6">
-                      <SectionTitle>Chi tiết học liệu</SectionTitle>
-                      <div className="mt-12 max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg text-center">
-                        <h3 className="text-2xl font-bold font-montserrat text-brand-maroon mb-4">Bản đồ tư duy & Timeline</h3>
-                        <p className="text-lg">
-                          Thông tin chi tiết về chủ đề Lịch sử 12, video, hình ảnh minh họa, bài tập,...
-                        </p>
-                      </div>
-                  </div>
-                </section>
-
-                {/* 4. Support Section */}
-                <section id="ho-tro" className="py-16 lg:py-24 bg-white">
+                
+                <section id="experience" className="py-16 lg:py-24 bg-brand-yellow">
                     <div className="container mx-auto px-6">
                         <SectionTitle>Dạy – Học – Trải nghiệm cùng nhau</SectionTitle>
-                        <div className="mt-12 grid md:grid-cols-2 gap-12">
-                            <div className="bg-gray-50 p-8 rounded-lg shadow-inner">
-                                <h3 className="text-2xl font-bold font-montserrat text-brand-maroon mb-4">👩‍🏫 Dành cho giáo viên</h3>
-                                <ul className="list-disc list-inside space-y-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto">
+                            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
+                                <h3 className="text-2xl font-bold font-montserrat text-brand-maroon mb-4"> Dành cho giáo viên</h3>
+                                <ul className="list-disc list-inside space-y-2 text-gray-700">
                                     <li>Giáo án mẫu, hoạt động lớp, công cụ đánh giá năng lực.</li>
                                     <li>Hướng dẫn ứng dụng CNTT (Canva, Quizizz, Google Form...).</li>
                                 </ul>
                             </div>
-                            <div className="bg-gray-50 p-8 rounded-lg shadow-inner">
-                                <h3 className="text-2xl font-bold font-montserrat text-brand-maroon mb-4">🧑‍🎓 Dành cho học sinh</h3>
-                                <ul className="list-disc list-inside space-y-2">
-                                    <li>Kho video bài giảng ngắn (5–10 phút).</li>
+                             <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
+                                <h3 className="text-2xl font-bold font-montserrat text-brand-maroon mb-4"> Dành cho học sinh</h3>
+                                 <ul className="list-disc list-inside space-y-2 text-gray-700">
+                                    <li>Kho video bài giảng ngắn (5-10 phút).</li>
                                     <li>Bài luyện trắc nghiệm theo từng chuyên đề.</li>
-                                    <li>Mục “Thử thách lịch sử” (gamified quiz).</li>
+                                    <li>Mục "Thử thách lịch sử" (gamification).</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 5. Interactive Experience Section */}
-                <section id="trai-nghiem" className="py-16 lg:py-24 bg-gray-800 text-white">
-                    <div className="container mx-auto px-6 text-center">
-                        <h2 className="text-3xl lg:text-4xl font-bold font-montserrat text-white">Học qua công nghệ</h2>
-                         <p className="mt-4 max-w-3xl mx-auto text-lg text-gray-300">
-                            Trải nghiệm Lịch sử một cách sống động hơn bao giờ hết với các mô phỏng tương tác, video 360°, và công nghệ AR/VR.
-                         </p>
-                        <div className="mt-8">
-                             <div className="aspect-w-16 aspect-h-9 bg-black rounded-lg shadow-lg flex items-center justify-center text-gray-400">
-                                <p>
-                                    [Video/Mô phỏng 3D về di tích lịch sử]
-                                </p>
-                             </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 6. Contact Section */}
-                <section id="lien-he" className="py-16 lg:py-24">
+                <section id="contact" className="py-16 lg:py-24 bg-brand-yellow">
                     <div className="container mx-auto px-6">
                         <SectionTitle>Góp ý & Liên hệ</SectionTitle>
-                        <div className="text-center max-w-3xl mx-auto mt-4 text-lg italic">
-                            <p>"Dân ta phải biết sử ta,</p>
-                            <p>Cho tường gốc tích nước nhà Việt Nam."</p>
-                            <span className="block mt-2 font-bold not-italic">– Hồ Chí Minh</span>
+                        <p className="mt-4 text-center text-lg text-gray-600 italic max-w-2xl mx-auto">"Dân ta phải biết sử ta,<br/>Cho tường gốc tích nước nhà Việt Nam."<br/>– Hồ Chí Minh</p>
+                        <div className="mt-10 max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+                            <form className="space-y-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">Tên của bạn</label>
+                                        <input type="text" id="name" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-maroon/50"/>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                                        <input type="email" id="email" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-maroon/50"/>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label htmlFor="role" className="block text-sm font-bold text-gray-700 mb-2">Bạn là</label>
+                                    <select id="role" className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-maroon/50">
+                                        <option>Học sinh</option>
+                                        <option>Giáo viên</option>
+                                        <option>Phụ huynh</option>
+                                        <option>Khác</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="message" className="block text-sm font-bold text-gray-700 mb-2">Nội dung góp ý</label>
+                                    <textarea id="message" rows={5} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-maroon/50"></textarea>
+                                </div>
+                                <div className="text-center">
+                                    <button type="submit" className="bg-brand-maroon text-white font-bold py-3 px-10 rounded-full text-lg hover:bg-red-800 transition-all duration-300 transform hover:scale-105">Gửi góp ý</button>
+                                </div>
+                            </form>
                         </div>
-                        <form className="mt-12 max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <input type="text" placeholder="Tên của bạn" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-maroon"/>
-                                <input type="email" placeholder="Email" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-maroon"/>
-                                <select className="w-full p-3 border border-gray-300 rounded-lg md:col-span-2 bg-white focus:ring-2 focus:ring-brand-maroon">
-                                    <option>Tôi là Giáo viên</option>
-                                    <option>Tôi là Học sinh</option>
-                                    <option>Khác</option>
-                                </select>
-                                <textarea placeholder="Nội dung góp ý..." rows={5} className="w-full p-3 border border-gray-300 rounded-lg md:col-span-2 focus:ring-2 focus:ring-brand-maroon"></textarea>
-                            </div>
-                            <div className="text-center mt-6">
-                                <button type="submit" className="bg-brand-maroon text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-red-800 transition duration-300">
-                                    Gửi góp ý
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </section>
             </main>
 
+            <footer className="bg-gray-800 text-white">
+                <div className="container mx-auto px-6 py-10 text-center">
+                    <h3 className="text-xl font-bold font-montserrat">Thông tin giảng viên</h3>
+                    <div className="mt-4 text-gray-300 space-y-1">
+                        <p>Võ Văn Dũng - 25 năm kinh nghiệm giảng dạy Lịch sử THPT</p>
+                        <p>Trường PT DTNT THPT Bình Phước, tỉnh Bình Phước</p>
+                        <p>ĐT: 0907130900 | Zalo: 0907130900</p>
+                    </div>
+                    <div className="mt-6 flex justify-center gap-6">
+                        <a href="#" className="hover:text-yellow-300 transition">Facebook</a>
+                        <a href="#" className="hover:text-yellow-300 transition">Zalo</a>
+                        <a href="#" className="hover:text-yellow-300 transition">Youtube</a>
+                    </div>
+                    <div className="mt-8 border-t border-gray-700 pt-6 text-sm text-gray-400">
+                        <p>&copy; 2025 - Dự án học liệu số Lịch sử 12. Phát triển vì cộng đồng.</p>
+                    </div>
+                </div>
+            </footer>
+            
             <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={modalContent.title}>
                 {modalContent.body}
             </Modal>
 
-            {/* Footer */}
-            <footer className="bg-gray-800 text-white py-8">
-                <div className="container mx-auto px-6 text-center text-gray-300">
-                    <div className="mb-4">
-                        <h4 className="font-bold font-montserrat text-white">Thông tin giảng viên</h4>
-                        <p className="mt-2">Võ Văn Dũng - 25 năm kinh nghiệm giảng dạy Lịch sử THPT</p>
-                        <p>Trường PT DTNT THPT Bình Phước, tỉnh Bình Phước</p>
-                        <p>ĐT: 0907130900 | Zalo: 0907130900</p>
-                    </div>
-                    <div className="flex justify-center gap-6 mb-4">
-                        <a href="#" className="hover:text-brand-yellow transition-colors">Facebook</a>
-                        <a href="#" className="hover:text-brand-yellow transition-colors">Zalo</a>
-                        <a href="#" className="hover:text-brand-yellow transition-colors">Youtube</a>
-                    </div>
-                    <p>&copy; 2025 - Dự án học liệu số Lịch sử 12. Phát triển vì cộng đồng.</p>
-                </div>
-            </footer>
+            {/* Chatbot Feature */}
+            <ChatbotWidget isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+            <button
+                onClick={() => setIsChatOpen(true)}
+                className={`fixed bottom-5 right-5 sm:right-10 z-50 bg-brand-maroon text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center transform transition-transform duration-300 hover:scale-110 ${isChatOpen ? 'scale-0' : 'scale-100'}`}
+                aria-label="Mở Sử Bot"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 5.589 2 10c0 2.908 1.897 5.515 5 6.934V22l5.34-4.005C17.064 17.582 22 14.132 22 10c0-4.411-4.486-8-10-8zm0 14c-4.411 0-8-2.691-8-6s3.589-6 8-6 8 2.691 8 6-3.589 6-8 6z"/><path d="M9.5 9c-.828 0-1.5.672-1.5 1.5S8.672 12 9.5 12s1.5-.672 1.5-1.5S10.328 9 9.5 9zm5 0c-.828 0-1.5.672-1.5 1.5S13.672 12 14.5 12s1.5-.672 1.5-1.5S15.328 9 14.5 9z"/></svg>
+            </button>
         </div>
     );
 };
